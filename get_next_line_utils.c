@@ -6,7 +6,7 @@
 /*   By: apiscopo <apiscopo@student.42lausanne.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 17:58:47 by apiscopo          #+#    #+#             */
-/*   Updated: 2024/10/23 21:42:37 by apiscopo         ###   ########.fr       */
+/*   Updated: 2024/10/27 18:58:15 by apiscopo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,16 @@
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	char	*tmp;
-	size_t	i;
+	char	*ptr;
+	size_t	total_size;
 
-	i = 0;
-	tmp = (char *)malloc(sizeof(size) * count + 1);
-	if (!tmp)
+	total_size = count * size;
+	ptr = malloc(total_size);
+	if (!ptr)
 		return (NULL);
-	while (i < count * size)
-	{
-		tmp[i] = 0;
-		i++;
-	}
-	tmp[i] = '\0';
-	return (tmp);
+	while (total_size--)
+		ptr[total_size] = 0;
+	return (ptr);
 }
 
 char	*ft_strchr(const char *str, int c)
@@ -51,6 +47,8 @@ char	*ft_strjoin(const char *s1, const char *s2)
 
 	i = 0;
 	j = 0;
+	if (!s1 || !s2)
+		return (NULL);
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
 	res = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
@@ -65,13 +63,12 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	return (res);
 }
 
-int	ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
-	while (str[i] != '\0')
+	while (str[i] != 0)
 		i++;
 	return (i);
 }
-

@@ -6,7 +6,7 @@
 /*   By: apiscopo <apiscopo@student.42lausanne.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 17:57:44 by apiscopo          #+#    #+#             */
-/*   Updated: 2024/10/24 16:48:05 by apiscopo         ###   ########.fr       */
+/*   Updated: 2024/10/27 18:57:08 by apiscopo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,18 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (NULL);
+		return (0);
 	buffer = read_file(fd, buffer);
 	if (buffer == NULL)
-		return (NULL);
+		return (0);
 	line = ft_line(buffer);
 	if (line == NULL)
-		return (NULL);
-	return (line);
+	{
+		free (buffer);
+		return (0);
+	}
 	buffer = ft_next(buffer);
+	return (line);
 }
 
 char	*read_file(int fd, char *res)
@@ -35,8 +38,10 @@ char	*read_file(int fd, char *res)
 	int		byte_read;
 
 	if (!res)
-		ft_calloc(1, 1);
+		res = ft_calloc(1, 1);
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (NULL);
 	byte_read = 1;
 	while (byte_read > 0)
 	{
@@ -50,7 +55,6 @@ char	*read_file(int fd, char *res)
 		res = ft_free(res, buffer);
 		if (ft_strchr(buffer, '\n'))
 			break ;
-
 	}
 	free (buffer);
 	return (res);
@@ -78,7 +82,10 @@ char	*ft_line(char *buffer)
 	line = ft_calloc(i + 2, sizeof(char));
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
-		line[i] = buffer[i++];
+	{
+		line[i] = buffer[i];
+		i++;
+	}
 	if (buffer[i] && buffer[i] == '\n')
 		line[i++] = '\n';
 	return (line);
@@ -99,6 +106,11 @@ char	*ft_next(char *buffer)
 		return (NULL);
 	}
 	line = ft_calloc(ft_strlen(buffer) - i + 1, sizeof(char));
+	if (!line)
+	{
+		free (buffer);
+		return (NULL);
+	}
 	i++;
 	j = 0;
 	while (buffer[i])
@@ -106,4 +118,3 @@ char	*ft_next(char *buffer)
 	free (buffer);
 	return (line);
 }
-
