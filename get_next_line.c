@@ -6,7 +6,7 @@
 /*   By: apiscopo <apiscopo@student.42lausanne.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 17:57:44 by apiscopo          #+#    #+#             */
-/*   Updated: 2024/10/27 18:57:08 by apiscopo         ###   ########.fr       */
+/*   Updated: 2024/11/11 19:34:45 by apiscopo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,23 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (0);
+	{
+		if (buffer)
+		{
+			free(buffer);
+			buffer = NULL;
+		}
+		return (NULL);
+	}
 	buffer = read_file(fd, buffer);
 	if (buffer == NULL)
-		return (0);
+		return (NULL);
 	line = ft_line(buffer);
 	if (line == NULL)
 	{
-		free (buffer);
-		return (0);
+		free(buffer);
+		buffer = NULL;
+		return (NULL);
 	}
 	buffer = ft_next(buffer);
 	return (line);
@@ -48,7 +56,8 @@ char	*read_file(int fd, char *res)
 		byte_read = read(fd, buffer, BUFFER_SIZE);
 		if (byte_read == -1)
 		{
-			free (buffer);
+			free(buffer);
+			free(res);
 			return (NULL);
 		}
 		buffer[byte_read] = '\0';
@@ -56,7 +65,7 @@ char	*read_file(int fd, char *res)
 		if (ft_strchr(buffer, '\n'))
 			break ;
 	}
-	free (buffer);
+	free(buffer);
 	return (res);
 }
 
@@ -65,7 +74,7 @@ char	*ft_free(char *buffer, char *buf)
 	char	*temp;
 
 	temp = ft_strjoin(buffer, buf);
-	free (buffer);
+	free(buffer);
 	return (temp);
 }
 
@@ -80,13 +89,15 @@ char	*ft_line(char *buffer)
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	line = ft_calloc(i + 2, sizeof(char));
+	if (!line)
+		return (NULL);
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 	{
 		line[i] = buffer[i];
 		i++;
 	}
-	if (buffer[i] && buffer[i] == '\n')
+	if (buffer[i] == '\n')
 		line[i++] = '\n';
 	return (line);
 }
@@ -95,26 +106,28 @@ char	*ft_next(char *buffer)
 {
 	int		i;
 	int		j;
-	char	*line;
+	char	*new_buffer;
 
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	if (!buffer[i])
 	{
-		free (buffer);
+		free(buffer);
 		return (NULL);
 	}
-	line = ft_calloc(ft_strlen(buffer) - i + 1, sizeof(char));
-	if (!line)
+	new_buffer = ft_calloc(ft_strlen(buffer) - i, sizeof(char));
+	if (!new_buffer)
 	{
-		free (buffer);
+		free(buffer);
 		return (NULL);
 	}
 	i++;
 	j = 0;
 	while (buffer[i])
-		line[j++] = buffer[i++];
-	free (buffer);
-	return (line);
+		new_buffer[j++] = buffer[i++];
+	free(buffer);
+	return (new_buffer);
 }
+
+
