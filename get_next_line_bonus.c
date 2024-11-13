@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wcapt <wcapt@student.42.fr>                +#+  +:+       +#+        */
+/*   By: apiscopo <apiscopo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 12:06:12 by wcapt             #+#    #+#             */
-/*   Updated: 2024/11/11 21:40:49 by wcapt            ###   ########.fr       */
+/*   Updated: 2024/11/11 21:59:49 by apiscopo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,9 @@ char *read_and_store(int fd, char **line)
     return (free(buffer), *line);
 }
 
-
 int	check_null(int fd, char **line)
 {
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= MAX_FD || BUFFER_SIZE <= 0)
 		return (1);
 	if (!*line)
 	{
@@ -97,31 +96,32 @@ int	check_null(int fd, char **line)
 
 char	*get_next_line(int fd)
 {
-	static char	*line = NULL;
+	static char	*lines[MAX_FD] = {NULL};
 	char		*dst;
 	char		*temp;
 
-	if (check_null(fd, &line) || !read_and_store(fd, &line))
+	if (check_null(fd, &lines[fd]) || !read_and_store(fd, &lines[fd]))
 		return (NULL);
-	dst = ft_put_line(line);
+	dst = ft_put_line(lines[fd]);
 	if (!dst)
 		return (NULL);
-	temp = line;
-	line = ft_strchr(line, '\n');
-	if (line)
+	temp = lines[fd];
+	lines[fd] = ft_strchr(lines[fd], '\n');
+	if (lines[fd])
 	{
-		line = ft_strdup(line + 1);
+		lines[fd] = ft_strdup(lines[fd] + 1);
 		free(temp);
-		if (!line)
+		if (!lines[fd])
 			return (NULL);
 	}
 	else
 	{
 		free(temp);
-		line = NULL;
+		lines[fd] = NULL;
 	}
 	return (dst);
 }
+
 
 /*
 #include <stdio.h>
