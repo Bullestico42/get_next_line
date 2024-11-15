@@ -11,6 +11,7 @@ Pour implémenter get_next_line, j'utilise :
     Quelques fonctions utilitaires issues de ma libft pour la gestion des chaînes de caractères.
 
 Quelle est la logique derrière le code ?
+-
 Prototypage :
 
     char *get_next_line(int fd);
